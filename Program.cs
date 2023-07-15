@@ -7,12 +7,12 @@ namespace SlotMachineGame
         /// <summary>
         /// Declared prefered symbol coefficients and probabilities
         /// </summary>
-        static Dictionary<char, SymbolInfo> MachineGameSymbols = new Dictionary<char, SymbolInfo>
+        static Dictionary<char, SymbolInfo> SYMBOLS = new Dictionary<char, SymbolInfo>
         {
-            { 'A', new SymbolInfo { Coefficient = 0.4, Probability = 0.45} },
-            { 'B', new SymbolInfo { Coefficient = 0.6, Probability = 0.35 } },
-            { 'P', new SymbolInfo { Coefficient = 0.8, Probability = 0.15 } },
-            { '*', new SymbolInfo { Coefficient = 0, Probability = 0.05 } }
+            { 'A', new SymbolInfo { Coefficient = 0.4, Probability = 0.45, Display = "🍎", Color = ConsoleColor.Red } },
+            { 'B', new SymbolInfo { Coefficient = 0.6, Probability = 0.35, Display = "🍌", Color = ConsoleColor.Yellow } },
+            { 'P', new SymbolInfo { Coefficient = 0.8, Probability = 0.15, Display = "🍍", Color = ConsoleColor.Green } },
+            { '*', new SymbolInfo { Coefficient = 0, Probability = 0.05, Display = "⭐", Color = ConsoleColor.White } }
         };
 
         /// <summary>
@@ -22,90 +22,124 @@ namespace SlotMachineGame
         {
             public double Coefficient { get; set; }
             public double Probability { get; set; }
+            public string Display { get; set; }
+            public ConsoleColor Color { get; set; }
         }
 
-
-        //Function to generate a random symbol based on its probability
+        /// <summary>
+        /// Generates a random symbol based on its probability 
+        /// </summary>
+        /// <returns>char</returns>
         static char GenerateSymbol()
         {
-            double randNum = new Random().NextDouble();
-            double cumulativeProb = 0;
-            foreach (var symbol in MachineGameSymbols)
+            double randomNum = new Random().NextDouble();
+            double cumulativeProbability = 0;
+            foreach (var symbol in SYMBOLS)
             {
-                cumulativeProb += symbol.Value.Probability;
-                if (randNum <= cumulativeProb)
+                cumulativeProbability += symbol.Value.Probability;
+                if (randomNum <= cumulativeProbability)
                     return symbol.Key;
             }
             return ' ';
         }
 
-        //Function to calculate the win amount based on the winning line(s)
+        /// <summary>
+        /// Calculates the win amount based on the winning line(s)
+        /// </summary>
+        /// <param name="line"></param>
+        /// <param name="stake"></param>
+        /// <returns>Double</returns>
         static double CalculateWin(string line, double stake)
         {
             double winCoefficient = 0;
             foreach (char symbol in line)
             {
-                winCoefficient += MachineGameSymbols[symbol].Coefficient;
+                winCoefficient += SYMBOLS[symbol].Coefficient;
             }
             return stake * winCoefficient;
         }
 
-        //Function to display the slot machine grid
+        /// <summary>
+        /// Displays our slot machine grid
+        /// </summary>
+        /// <param name="grid"></param>
         static void DisplayGrid(char[,] grid)
         {
-            int rows = grid.GetLength(0);
-            int columns = grid.GetLength(1);
+            Console.Clear();
+            int numRows = grid.GetLength(0);
+            int numColumns = grid.GetLength(1);
 
-            for (int i = 0; i < rows; i++)
+            Console.WriteLine("┌─────────────┐");
+            for (int row = 0; row <= numRows - 1; row++)
             {
-                for (int j = 0; j < columns; j++)
+                Console.Write("│");
+                for (int col = 0; col <= numColumns - 1; col++)
                 {
-                    Console.Write(grid[i, j] + " ");
+                    char symbol = grid[row, col];
+                    ConsoleColor color = SYMBOLS[symbol].Color;
+                    string display = SYMBOLS[symbol].Display;
+
+                    Console.ForegroundColor = color;
+                    //TODO - Choose next line based on code editor
+                    //Console.WriteLine(symbol); //When using Visual Studio - since Emoji don't work on Console Debugger
+                    Console.Write(display); //When using VS Code - Emojis works well
+                    Console.ResetColor();
+                    Console.Write(" │ ");
                 }
                 Console.WriteLine();
+                if (row < numRows - 1)
+                {
+                    Console.WriteLine("├─────────────┤");
+                }
             }
+            Console.WriteLine("└─────────────┘");
         }
 
-        //Function to check if a line is a winning line
+        /// <summary>
+        /// Checks if a line is a winning line
+        /// </summary>
+        /// <param name="line"></param>
+        /// <returns>Boolean</returns>
         static bool IsWinningLine(string line)
         {
-            HashSet<char> symbols = new HashSet<char>(line);
-            if (symbols.Contains('*'))
-                symbols.Remove('*');
-            return symbols.Count == 1;
+            HashSet<char> uniqueSymbols = new HashSet<char>(line);
+            if (uniqueSymbols.Contains('*'))
+                uniqueSymbols.Remove('*');
+            return uniqueSymbols.Count == 1;
         }
 
-        //Function to animate the spinning effect
+        /// <summary>
+        /// Animates the spinning effect
+        /// </summary>
         static void AnimateSpinning()
         {
+            Console.Clear();
             Console.CursorVisible = false;
 
             char[,] grid = new char[4, 3];
-            for (int i = 0; i <= 3; i++)
+            for (int row = 0; row <= 3; row++)
             {
-                for (int j = 0; j <= 2; j++)
+                for (int col = 0; col <= 2; col++)
                 {
-                    grid[i, j] = GenerateSymbol();
+                    grid[row, col] = GenerateSymbol();
                 }
             }
 
-            // Perform spinning animation for a few iterations
+            //Do spinning animation for a few iterations
             for (int iteration = 0; iteration < 10; iteration++)
             {
-                // Update grid symbols for spinning effect
-                for (int i = 0; i <= 3; i++)
+                //Update grid symbols for spinning effect
+                for (int row = 0; row <= 3; row++)
                 {
-                    for (int j = 0; j <= 2; j++)
+                    for (int col = 0; col <= 2; col++)
                     {
-                        grid[i, j] = GenerateSymbol();
+                        grid[row, col] = GenerateSymbol();
                     }
                 }
 
-                //Display the grid
-                Console.Clear();
                 DisplayGrid(grid);
 
-                //Wait for a short interval to create the spinning effect
+                //Wait for a short interval to create the flashing effect
                 Thread.Sleep(200);
             }
 
@@ -117,58 +151,57 @@ namespace SlotMachineGame
         /// </summary>
         static void PlaySlotMachine()
         {
-            Console.Write("Please deposit money you would like to play with: ");
-            double deposit = Convert.ToDouble(Console.ReadLine());
-            double balance = deposit;
+            Console.OutputEncoding = Encoding.UTF8;
+            Console.Write("Please enter the amount of money you would like to play with: ");
+            double depositAmount = Convert.ToDouble(Console.ReadLine());
+            double balance = depositAmount;
 
             while (balance > 0)
             {
-                Console.Write("Enter stake amount: ");
-                double stake = Convert.ToDouble(Console.ReadLine());
+                Console.Write("Enter the amount you want to stake: ");
+                double stakeAmount = Convert.ToDouble(Console.ReadLine());
 
-                //Animate spinning effect
                 AnimateSpinning();
 
                 //Generate the final slot machine grid
                 char[,] grid = new char[4, 3];
-                for (int i = 0; i <= 3; i++)
+                for (int row = 0; row <= 3; row++)
                 {
-                    for (int j = 0; j <= 2; j++)
+                    for (int col = 0; col <= 2; col++)
                     {
-                        grid[i, j] = GenerateSymbol();
+                        grid[row, col] = GenerateSymbol();
                     }
                 }
 
-                // Display the final grid
-                Console.Clear();
                 DisplayGrid(grid);
 
-                // Check for winning lines
-                List<string> winnings = new List<string>();
-                for (int i = 0; i <= 3; i++)
+                //Checks for winning lines
+                List<string> winningLines = new List<string>();
+                for (int row = 0; row <= 3; row++)
                 {
-                    string row = "";
-                    for (int j = 0; j <= 2; j++)
+                    string line = "";
+                    for (int col = 0; col <= 2; col++)
                     {
-                        row += grid[i, j];
+                        line += grid[row, col];
                     }
-                    if (IsWinningLine(row))
+                    if (IsWinningLine(line))
                     {
-                        winnings.Add(row);
+                        winningLines.Add(line);
                     }
                 }
 
-                //Calculate and display the win amount
+                //Calculates and displays the win amount
                 double winAmount = 0;
-                foreach (string line in winnings)
+                foreach (string line in winningLines)
                 {
-                    winAmount += CalculateWin(line, stake);
+                    winAmount += CalculateWin(line, stakeAmount);
                 }
-                balance = (balance - stake) + winAmount;
+                balance = (balance - stakeAmount) + winAmount;
                 Console.WriteLine($"\nYou have won: {winAmount}");
                 Console.WriteLine($"Current balance is: {balance}\n");
             }
         }
+
         static void Main(string[] args)
         {
             Console.Clear();
