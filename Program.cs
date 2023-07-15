@@ -25,7 +25,7 @@ namespace SlotMachineGame
         }
 
 
-        // Function to generate a random symbol based on its probability
+        //Function to generate a random symbol based on its probability
         static char GenerateSymbol()
         {
             double randNum = new Random().NextDouble();
@@ -39,7 +39,7 @@ namespace SlotMachineGame
             return ' ';
         }
 
-        // Function to calculate the win amount based on the winning line(s)
+        //Function to calculate the win amount based on the winning line(s)
         static double CalculateWin(string line, double stake)
         {
             double winCoefficient = 0;
@@ -50,7 +50,7 @@ namespace SlotMachineGame
             return stake * winCoefficient;
         }
 
-        // Function to display the slot machine grid
+        //Function to display the slot machine grid
         static void DisplayGrid(char[,] grid)
         {
             int rows = grid.GetLength(0);
@@ -66,7 +66,7 @@ namespace SlotMachineGame
             }
         }
 
-        // Function to check if a line is a winning line
+        //Function to check if a line is a winning line
         static bool IsWinningLine(string line)
         {
             HashSet<char> symbols = new HashSet<char>(line);
@@ -75,15 +75,15 @@ namespace SlotMachineGame
             return symbols.Count == 1;
         }
 
-        // Function to animate the spinning effect
+        //Function to animate the spinning effect
         static void AnimateSpinning()
         {
             Console.CursorVisible = false;
 
             char[,] grid = new char[4, 3];
-            for (int i = 0; i < 4; i++)
+            for (int i = 0; i <= 3; i++)
             {
-                for (int j = 0; j < 3; j++)
+                for (int j = 0; j <= 2; j++)
                 {
                     grid[i, j] = GenerateSymbol();
                 }
@@ -93,19 +93,19 @@ namespace SlotMachineGame
             for (int iteration = 0; iteration < 10; iteration++)
             {
                 // Update grid symbols for spinning effect
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i <= 3; i++)
                 {
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j <= 2; j++)
                     {
                         grid[i, j] = GenerateSymbol();
                     }
                 }
 
-                // Display the grid
+                //Display the grid
                 Console.Clear();
                 DisplayGrid(grid);
 
-                // Wait for a short interval to create the spinning effect
+                //Wait for a short interval to create the spinning effect
                 Thread.Sleep(200);
             }
 
@@ -126,14 +126,14 @@ namespace SlotMachineGame
                 Console.Write("Enter stake amount: ");
                 double stake = Convert.ToDouble(Console.ReadLine());
 
-                // Animate spinning effect
+                //Animate spinning effect
                 AnimateSpinning();
 
-                // Generate the final slot machine grid
+                //Generate the final slot machine grid
                 char[,] grid = new char[4, 3];
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i <= 3; i++)
                 {
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j <= 2; j++)
                     {
                         grid[i, j] = GenerateSymbol();
                     }
@@ -145,10 +145,10 @@ namespace SlotMachineGame
 
                 // Check for winning lines
                 List<string> winnings = new List<string>();
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i <= 3; i++)
                 {
                     string row = "";
-                    for (int j = 0; j < 3; j++)
+                    for (int j = 0; j <= 2; j++)
                     {
                         row += grid[i, j];
                     }
@@ -158,7 +158,7 @@ namespace SlotMachineGame
                     }
                 }
 
-                // Calculate and display the win amount
+                //Calculate and display the win amount
                 double winAmount = 0;
                 foreach (string line in winnings)
                 {
