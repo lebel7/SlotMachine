@@ -41,6 +41,7 @@ namespace SlotMachineGame
 
         public double CalculateWin(string line, double stake)
         {
+            if (MachineGameSymbols == null) return 0;
             double winCoefficient = 0;
             if(MachineGameSymbols == null) return winCoefficient;
             foreach (char symbol in line)
