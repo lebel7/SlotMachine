@@ -132,10 +132,17 @@ namespace SlotMachineGame
             Console.OutputEncoding = Encoding.UTF8;
             double balance = depositAmount;
 
-            while (balance > 0)
+            while (balance > 0 && balance >= 10)
             {
                 Console.Write("Enter the amount you want to stake: ");
                 double stakeAmount = Convert.ToDouble(Console.ReadLine());
+
+                // Validate the stake amount
+                if (stakeAmount < 10.00 || stakeAmount > balance)
+                {
+                    Console.WriteLine("Invalid stake amount. Please try again.");
+                    continue;
+                }
 
                 AnimateSpinning();
 
@@ -151,10 +158,10 @@ namespace SlotMachineGame
                 DisplayGrid(grid);
 
                 List<string> winningLines = new();
-                for (int row = 0; row < NumRows - 1; row++)
+                for (int row = 0; row < NumRows; row++)
                 {
                     string line = "";
-                    for (int col = 0; col < NumColumns - 1; col++)
+                    for (int col = 0; col < NumColumns; col++)
                     {
                         line += grid[row, col];
                     }
@@ -173,6 +180,7 @@ namespace SlotMachineGame
                 Console.WriteLine($"\nYou have won: {winAmount}");
                 Console.WriteLine($"Current balance is: {balance}\n");
             }
+            Console.WriteLine("Game Over !!");
         }
     }
 }
