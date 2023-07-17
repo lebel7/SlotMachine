@@ -1,4 +1,5 @@
-﻿using System.Text;
+﻿using NAudio.Wave;
+using System.Text;
 
 namespace SlotMachineGame
 {
@@ -7,11 +8,15 @@ namespace SlotMachineGame
         private Dictionary<char, SymbolInfo>? MachineGameSymbols;
         private const int NumRows = 4;
         private const int NumColumns = 3;
+        private WaveOutEvent? waveOutEvent = null;
+        private AudioFileReader? audioFileReader = null;
+        private LoopStream? loopStream = null;
 
         public SlotMachine()
         {
             MachineGameSymbols = new Dictionary<char, SymbolInfo>();
             InitializeSymbols();
+            LoadSoundEffects();
         }
 
         private void InitializeSymbols()
@@ -25,10 +30,59 @@ namespace SlotMachineGame
             };
         }
 
+        private void LoadSoundEffects()
+        {
+            waveOutEvent = new WaveOutEvent();
+            audioFileReader = new AudioFileReader(@"C:\Windows\Media\chimes.wav");
+        }
+
+        private void PlaySoundEffect(string filePath)
+        {
+            audioFileReader?.Dispose();
+            audioFileReader = new AudioFileReader(filePath);
+            waveOutEvent?.Stop();
+            waveOutEvent?.Init(audioFileReader);
+            waveOutEvent?.Play();
+        }
+
+        public void PlayWinSound()
+        {
+            PlaySoundEffect(@"C:\Windows\Media\Windows Restore.wav");
+        }
+
+        public void PlayLoseSound()
+        {
+            PlaySoundEffect(@"C:\Windows\Media\recycle.wav");
+        }
+
+        private void PlaySpinningSound()
+        {
+            string filePath = @"C:\Windows\Media\Windows Ringin.wav";
+
+            if (File.Exists(filePath))
+            {
+                audioFileReader?.Dispose();
+                audioFileReader = new AudioFileReader(filePath);
+
+                loopStream?.Dispose();
+                loopStream = new LoopStream(audioFileReader, 10);
+
+                waveOutEvent?.Stop();
+                waveOutEvent?.Init(loopStream);
+                waveOutEvent?.Play();
+            }
+        }
+
+        public void PlayGameOverSound()
+        {
+            PlaySoundEffect(@"C:\Windows\Media\Windows Notify Email.wav");
+        }
+
         public char GenerateSymbol()
         {
             double randomNum = new Random().NextDouble();
             double cumulativeProbability = 0;
+
             if (MachineGameSymbols == null) return ' ';
             foreach (var symbol in MachineGameSymbols)
             {
@@ -43,6 +97,7 @@ namespace SlotMachineGame
         {
             if (MachineGameSymbols == null) return 0;
             double winCoefficient = 0;
+
             if(MachineGameSymbols == null) return winCoefficient;
             foreach (char symbol in line)
             {
@@ -61,6 +116,8 @@ namespace SlotMachineGame
 
         public void AnimateSpinning()
         {
+            Task.Run(() => PlaySpinningSound());
+            //PlaySpinningSound();
             Console.Clear();
             Console.CursorVisible = false;
 
@@ -84,10 +141,10 @@ namespace SlotMachineGame
                 }
 
                 DisplayGrid(grid);
-
                 Thread.Sleep(200);
             }
 
+            waveOutEvent?.Stop();
             Console.CursorVisible = true;
         }
 
@@ -176,11 +233,24 @@ namespace SlotMachineGame
                 {
                     winAmount += CalculateWin(line, stakeAmount);
                 }
+
                 balance = (balance - stakeAmount) + winAmount;
                 Console.WriteLine($"\nYou have won: {winAmount}");
                 Console.WriteLine($"Current balance is: {balance}\n");
+
+                if (winAmount > 0)
+                {
+                    PlayWinSound();
+                }
+                else
+                {
+                    PlayLoseSound();
+                }
             }
+
+            PlayGameOverSound();
             Console.WriteLine("Game Over !!");
+            waveOutEvent?.Stop();
         }
     }
 }

@@ -28,7 +28,6 @@ public class SlotMachineTests
     [TestMethod]
     public void TestIsWinningLine()
     {
-        _ = new SlotMachine();
         bool isWinning = SlotMachine.IsWinningLine("AAA");
         Assert.IsTrue(isWinning);
 
