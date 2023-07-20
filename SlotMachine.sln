@@ -7,6 +7,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlotMachine", "src\SlotMach
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SlotMachineTests", "tests\SlotMachineTests.csproj", "{67117B79-0155-4D04-B13C-CEA3D031F3F0}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Media", "Media", "{3349509C-ED15-42C6-B018-018FECE19CC8}"
+	ProjectSection(SolutionItems) = preProject
+		media\chimes.wav = media\chimes.wav
+		media\recycle.wav = media\recycle.wav
+		media\Windows Notify Email.wav = media\Windows Notify Email.wav
+		media\Windows Restore.wav = media\Windows Restore.wav
+		media\Windows Ringin.wav = media\Windows Ringin.wav
+		media\Windows Unlock.wav = media\Windows Unlock.wav
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

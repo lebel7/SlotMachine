@@ -6,20 +6,40 @@ namespace SlotMachineGame
     {
         static void Main()
         {
+            var parentDirectory = string.Empty;
             Console.Clear();
             Console.ForegroundColor = ConsoleColor.Yellow;
             Console.WriteLine("Welcome to the Slot Machine Game!\n");
             Console.ResetColor();
-            if (OperatingSystem.IsWindows())
+
+            var dir = Directory.GetCurrentDirectory();
+            if (dir != null)
             {
-                var winSound = new SoundPlayer(@"C:\Windows\Media\Windows Unlock.wav");
-                winSound.Play();
+                var binIndex = dir.IndexOf("\\src");
+                if (binIndex >= 0)
+                {
+                    parentDirectory = dir[..binIndex];
+                    if (OperatingSystem.IsWindows())
+                    {
+                        var welcomeSound = @$"{parentDirectory}\Media\Windows Unlock.wav";
+                        var winSound = new SoundPlayer(welcomeSound);
+                        winSound.Play();
+                    }
+                }
+                else
+                {
+                    Console.WriteLine("Error: Could not find the parent directory.");
+                }
             }
-            
+            else
+            {
+                Console.WriteLine("Error: Could not get the current directory.");
+            }
+
             Console.Write("Please enter the amount of money you would like to play with: ");
             double depositAmount = Convert.ToDouble(Console.ReadLine());
 
-            SlotMachine slotMachine = new();
+            SlotMachine slotMachine = new(parentDirectory);
             slotMachine.PlaySlotMachine(depositAmount);
         }
     }

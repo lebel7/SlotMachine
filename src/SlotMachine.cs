@@ -11,9 +11,23 @@ namespace SlotMachineGame
         private WaveOutEvent? waveOutEvent = null;
         private AudioFileReader? audioFileReader = null;
         private LoopStream? loopStream = null;
+        private readonly string ParentDirectory = string.Empty;
+        private readonly string ChimeSound = string.Empty;
+        private readonly string WinSound = string.Empty;
+        private readonly string LoseSound = string.Empty;
+        private readonly string SpinningSound = string.Empty;
+        private readonly string GameOverSound = string.Empty;
 
-        public SlotMachine()
+        public SlotMachine(string parentDirectory = "")
         {
+            ParentDirectory = parentDirectory;
+            if(ParentDirectory != string.Empty) { 
+                ChimeSound = @$"{ParentDirectory}\Media\chimes.wav";
+                WinSound = @$"{ParentDirectory}\Media\Windows Restore.wav";
+                LoseSound = @$"{ParentDirectory}\Media\recycle.wav";
+                SpinningSound = @$"{ParentDirectory}\Media\Windows Ringin.wav";
+                GameOverSound = @$"{ParentDirectory}\Media\Windows Notify Email.wav";
+            }
             MachineGameSymbols = new Dictionary<char, SymbolInfo>();
             InitializeSymbols();
             LoadSoundEffects();
@@ -32,37 +46,41 @@ namespace SlotMachineGame
 
         private void LoadSoundEffects()
         {
-            waveOutEvent = new WaveOutEvent();
-            audioFileReader = new AudioFileReader(@"C:\Windows\Media\chimes.wav");
+            if(ParentDirectory != null)
+            {
+                waveOutEvent = new WaveOutEvent();
+                audioFileReader = new AudioFileReader(ChimeSound);
+            }
         }
 
         private void PlaySoundEffect(string filePath)
         {
-            audioFileReader?.Dispose();
-            audioFileReader = new AudioFileReader(filePath);
-            waveOutEvent?.Stop();
-            waveOutEvent?.Init(audioFileReader);
-            waveOutEvent?.Play();
+            if(ParentDirectory != null)
+            {
+                audioFileReader?.Dispose();
+                audioFileReader = new AudioFileReader(filePath);
+                waveOutEvent?.Stop();
+                waveOutEvent?.Init(audioFileReader);
+                waveOutEvent?.Play();
+            }
         }
 
         public void PlayWinSound()
         {
-            PlaySoundEffect(@"C:\Windows\Media\Windows Restore.wav");
+            if(!string.IsNullOrWhiteSpace(WinSound)) PlaySoundEffect(WinSound);
         }
 
         public void PlayLoseSound()
         {
-            PlaySoundEffect(@"C:\Windows\Media\recycle.wav");
+            if(!string.IsNullOrWhiteSpace(LoseSound)) PlaySoundEffect(LoseSound);
         }
 
         private void PlaySpinningSound()
         {
-            string filePath = @"C:\Windows\Media\Windows Ringin.wav";
-
-            if (File.Exists(filePath))
+            if (File.Exists(SpinningSound))
             {
                 audioFileReader?.Dispose();
-                audioFileReader = new AudioFileReader(filePath);
+                audioFileReader = new AudioFileReader(SpinningSound);
 
                 loopStream?.Dispose();
                 loopStream = new LoopStream(audioFileReader, 10);
@@ -75,7 +93,7 @@ namespace SlotMachineGame
 
         public void PlayGameOverSound()
         {
-            PlaySoundEffect(@"C:\Windows\Media\Windows Notify Email.wav");
+            if(!string.IsNullOrWhiteSpace(GameOverSound)) PlaySoundEffect(GameOverSound);
         }
 
         public char GenerateSymbol()
@@ -116,8 +134,7 @@ namespace SlotMachineGame
 
         public void AnimateSpinning()
         {
-            Task.Run(() => PlaySpinningSound());
-            //PlaySpinningSound();
+            PlaySpinningSound();
             Console.Clear();
             Console.CursorVisible = false;
 
