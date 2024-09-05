@@ -37,7 +37,9 @@ namespace SlotMachineGame
             }
 
             Console.Write("Please enter the amount of money you would like to play with: ");
-            double depositAmount = Convert.ToDouble(Console.ReadLine());
+            // TODO: Create an InputService class in a separate file (e.g., src/InputService.cs)
+            InputService inputService = new InputService();
+            double depositAmount = inputService.GetValidatedInput(10, 2000000);
 
             SlotMachine slotMachine = new(parentDirectory);
             slotMachine.PlaySlotMachine(depositAmount);
